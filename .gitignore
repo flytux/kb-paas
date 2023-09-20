@@ -6,3 +6,4 @@ kubectl
 *.key
 *.pub
 .terraform
+*.qcow2

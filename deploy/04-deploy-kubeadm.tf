@@ -29,7 +29,7 @@ resource "terraform_data" "copy_installer" {
     user        = "root"
     type        = "ssh"
     private_key = "${tls_private_key.generic-ssh-key.private_key_openssh}"
-    timeout     = "1m"
+    timeout     = "2m"
   }
 
   provisioner "file" {
@@ -44,13 +44,16 @@ resource "terraform_data" "copy_installer" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
+       
+      setenforce 0
+      sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 
       echo "192.168.122.51 docker.kw01" >> /etc/hosts
 
-      dpkg -i kubeadm/packages/*.deb
+      rpm -Uvh kubeadm/packages/*.rpm
 
-      cp kubeadm/packages/registry.* /usr/local/share/ca-certificates/
-      update-ca-certificates
+      cp kubeadm/packages/registry.* /etc/pki/ca-trust/source/anchors/
+      update-ca-trust
 
       mkdir -p /etc/containerd
       cp kubeadm/packages/config.toml /etc/containerd/

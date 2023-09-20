@@ -1,20 +1,21 @@
 variable "password" { default = "linux" }
 
-variable "network_name" { default = "nat10710" }
+variable "network_name" { default = "nat100" }
 
-variable "prefix_ip" { default = "10.71.0" }
+variable "prefix_ip" { default = "100.100.100" }
 
-variable "master_ip" { default = "10.71.0.101" }
+variable "master_ip" { default = "100.100.100.101" }
 
 variable "network_domain_name" { default = "kubeworks.net" }
 
-variable "cloud_image_name" { default = "focal-server-cloudimg-amd64.img" }
+#variable "cloud_image_name" { default = "focal-server-cloudimg-amd64.img" }
+variable "cloud_image_name" { default = "Rocky-8-GenericCloud.latest.x86_64.qcow2" }
 
 variable "disk_pool" { default = "default" }
 
 variable "qemu_connect" { default = "qemu:///system" }
 
-variable "join_cmd" { default = "$(ssh -i $HOME/.ssh/id_rsa.key -o StrictHostKeyChecking=no 10.71.0.101 -- cat join_cmd)" }
+variable "join_cmd" { default = "$(ssh -i $HOME/.ssh/id_rsa.key -o StrictHostKeyChecking=no 100.100.100.101 -- cat join_cmd)" }
 
 variable "kubeadm_nodes" { 
 
