@@ -1,0 +1,8 @@
+kubeadm.tar
+focal-server-cloudimg-amd64.img
+kubelet
+kubeadm
+kubectl
+*.key
+*.pub
+.terraform
