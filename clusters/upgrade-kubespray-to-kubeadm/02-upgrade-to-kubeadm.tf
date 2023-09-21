@@ -1,3 +1,18 @@
+resource "terraform_data" "prepare_kubeconfig" {
+  connection {
+    host        = "${var.prefix_ip}.${each.value.octetIP}"
+    user        = "root"
+    type        = "ssh"
+    private_key = file("${path.module}/../kubespray/.ssh-default/id_rsa.key")
+    timeout     = "2m"
+  }
+
+  provisioner "file" {
+    source      = "artifacts/kubeadm"
+    destination = "/root"
+  }
+
+
 resource "terraform_data" "master_init_containerd_upgrade" {
   for_each =  {for key, val in var.kubeadm_nodes:
                key => val if val.role == "master-init"}
