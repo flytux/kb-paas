@@ -1,5 +1,4 @@
 resource "terraform_data" "master_init_containerd_upgrade" {
-  
   for_each =  {for key, val in var.kubeadm_nodes:
                key => val if val.role == "master-init"}
   connection {
@@ -52,7 +51,7 @@ resource "terraform_data" "master_init_containerd_upgrade" {
 }
 
 resource "terraform_data" "master_member_containerd_upgrade" {
-  
+  depends_on = [terraform_data.master_init_containerd_upgrade]
   for_each =  {for key, val in var.kubeadm_nodes:
                key => val if val.role == "master-member"}
   connection {
@@ -105,7 +104,7 @@ resource "terraform_data" "master_member_containerd_upgrade" {
 }
 
 resource "terraform_data" "worker_containerd_upgrade" {
-  
+  depends_on = [terraform_data.master_member_containerd_upgrade]  
   for_each =  {for key, val in var.kubeadm_nodes:
                key => val if val.role == "worker"}
   connection {
