@@ -1,5 +1,5 @@
 kubeadm.tar
-focal-server-cloudimg-amd64.img
+*.img
 kubelet
 kubeadm
 kubectl

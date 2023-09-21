@@ -1,0 +1,15 @@
+ingress:
+  enabled: true
+  className: nginx
+  path: /
+  hosts:
+    - docker.kw01
+  tls:
+    - secretName: docker-tls
+      hosts:
+        - docker.kw01
+persistence:
+  accessMode: 'ReadWriteOnce'
+  enabled: true
+  size: 5Gi
+  storageClass: local-path

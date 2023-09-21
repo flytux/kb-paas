@@ -1,0 +1,8 @@
+controller:
+  name: controller
+  image:
+    chroot: false
+    registry: registry.k8s.io
+    image: ingress-nginx/controller
+    tag: "v1.8.2"
+  hostNetwork: true
