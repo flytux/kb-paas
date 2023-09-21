@@ -32,7 +32,7 @@ resource "terraform_data" "master_init_containerd_upgrade" {
       \cp -rf kubeadm/cni /opt
 
       echo "=== change container runtime annotaion of nodes  ==="
-      kubectl get nodes -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
+      kubectl get node $(hostname) -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
       systemctl stop kubelet
       
 
@@ -85,7 +85,7 @@ resource "terraform_data" "master_member_containerd_upgrade" {
       \cp -rf kubeadm/cni /opt
 
       echo "=== change container runtime annotaion of nodes  ==="
-      kubectl get nodes -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
+      kubectl get node $(hostname) -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
       systemctl stop kubelet
       
 
@@ -138,7 +138,7 @@ resource "terraform_data" "worker_containerd_upgrade" {
       \cp -rf kubeadm/cni /opt
 
       echo "=== change container runtime annotaion of nodes  ==="
-      kubectl get nodes -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
+      kubectl get node $(hostname) -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
       systemctl stop kubelet
       
 
