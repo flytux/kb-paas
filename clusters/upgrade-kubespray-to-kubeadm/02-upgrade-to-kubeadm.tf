@@ -122,7 +122,13 @@ resource "terraform_data" "worker_containerd_upgrade" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-       
+
+      # need to copy ssh key fist!!!!!!!!!!
+      # build master_ip 
+      mkdir -p $HOME/.kube
+      ssh -i $HOME/.ssh/id_rsa.key -o StrictHostKeyChecking=no ${master_ip} -- cat /etc/kubernetes/admin.conf > $HOME/.kube/config
+      sed -i "s/127\.0\.0\.1/{master_ip}/g" $HOME/.kube/config
+
       setenforce 0
       sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
       
@@ -137,6 +143,7 @@ resource "terraform_data" "worker_containerd_upgrade" {
 
       \cp -rf kubeadm/cni /opt
 
+      \cp kubeadm/bin/kubectl /usr/local/bin
       echo "=== change container runtime annotaion of nodes  ==="
       kubectl get node $(hostname) -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
       systemctl stop kubelet
