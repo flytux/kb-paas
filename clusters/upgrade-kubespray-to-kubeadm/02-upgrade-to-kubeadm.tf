@@ -1,12 +1,4 @@
-resource "local_file" "upgrade_worker" {
-    content     = templatefile("${path.module}/artifacts/templates/upgrade-worker.sh", {
-                    master_ip = var.master_ip
-                   })
-    filename = "${path.module}/artifacts/kubeadm/upgrade-worker.sh"
-}
-
-resource "terraform_data" "copy_installer" {
-  depends_on = [local_file.upgrade_worker]
+resource "terraform_data" "copy_upgrade_containerd" {
   for_each = var.kubeadm_nodes
   connection {
     host        = "${var.prefix_ip}.${each.value.octetIP}"
@@ -27,13 +19,6 @@ resource "terraform_data" "copy_installer" {
       setenforce 0
       sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 
-      echo "10.10.10.101 docker.kw01" >> /etc/hosts
-
-      rpm -Uvh kubeadm/packages/*.rpm
-
-      cp kubeadm/packages/registry.* /etc/pki/ca-trust/source/anchors/
-      update-ca-trust
-
       systemctl stop kubelet
       systemctl disable docker.service --now
 
@@ -41,14 +26,13 @@ resource "terraform_data" "copy_installer" {
       cp kubeadm/packages/config.toml /etc/containerd/
       mkdir -p /etc/nerdctl
       cp kubeadm/bin/nerdctl.toml /etc/nerdctl/nerdctl.toml
-
       systemctl restart containerd
+
+      nerdctl load -i kubeadm/kubeadm.tar
 
       cp kubeadm/bin/* /usr/local/bin
       chmod +x /usr/local/bin/*
       cp -R kubeadm/cni /opt
-
-      nerdctl load -i kubeadm/kubeadm.tar
 
       cp kubeadm/kubelet.service /etc/systemd/system
       mv -f kubeadm/kubelet.service.d /etc/systemd/system
