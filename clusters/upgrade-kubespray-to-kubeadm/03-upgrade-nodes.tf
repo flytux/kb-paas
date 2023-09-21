@@ -1,21 +1,29 @@
-resource "local_file" "upgrade_worker" {
+resource "local_file" "prepare-upgrade-master" {
+    content     = templatefile("${path.module}/artifacts/templates/upgrade-master.sh", {
+                    master_ip = var.master_ip
+                   })
+    filename = "${path.module}/artifacts/kubeadm/upgrade-worker.sh"
+}
+
+resource "local_file" "prepare-upgrade-worker" {
+    depends_on = [local_file.prepare-upgrade-master]
     content     = templatefile("${path.module}/artifacts/templates/upgrade-worker.sh", {
                     master_ip = var.master_ip
                    })
     filename = "${path.module}/artifacts/kubeadm/upgrade-worker.sh"
 }
 
-resource "terraform_data" "prepare_scrupt" {
-  depends_on = [local_file.upgrade_worker]
+resource "terraform_data" "prepare_script" {
+  depends_on = [local_file.prepare-upgrade-worker]
 
   provisioner "local-exec" {
   command = <<EOF
-    echo "Create upgrade-master.sh"
+    echo "Config upgrade-master.sh"
     sed -i "s/NEW_VERSION=.*/NEW_VERSION=${var.new_version}/" artifacts/kubeadm/upgrade-master.sh
     sed -i "s/MASTER_IP=.*/MASTER_IP=${var.master_ip}/" artifacts/kubeadm/upgrade-master.sh
     cat artifacts/kubeadm/upgrade-master.sh | grep NEW_VERSION
 
-    echo "Create upgrade-worker.sh"
+    echo "Config upgrade-worker.sh"
     sed -i "s/NEW_VERSION=.*/NEW_VERSION=${var.new_version}/" artifacts/kubeadm/upgrade-worker.sh
     cat artifacts/kubeadm/upgrade-worker.sh | grep NEW_VERSION
   EOF
@@ -23,7 +31,7 @@ resource "terraform_data" "prepare_scrupt" {
 }
 
 resource "terraform_data" "upgrade_master_init" {
-  depends_on = [terraform_data.prepare_scrupt]
+  depends_on = [terraform_data.prepare_script]
 
   for_each =  {for key, val in var.kubeadm_nodes:
                key => val if val.role == "master-init"}
