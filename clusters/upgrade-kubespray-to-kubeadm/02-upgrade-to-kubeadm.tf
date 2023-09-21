@@ -1,19 +1,16 @@
 resource "terraform_data" "prepare_kubeconfig" {
-  connection {
-    host        = "${var.prefix_ip}.${each.value.octetIP}"
-    user        = "root"
-    type        = "ssh"
-    private_key = file("${path.module}/../kubespray/.ssh-default/id_rsa.key")
-    timeout     = "2m"
+  provisioner "local-exec" {
+    command = <<EOF
+      mkdir artifacts/kubeadm/.kube
+      ssh -i ../kubespray/.ssh-default/id_rsa.key -o StrictHostKeyChecking=no ${var.master_ip} -- cat /etc/kubernetes/admin.conf > artifacts/kubeadm/.kube/config
+      sed -i "s/127\.0\.0\.1/${var.master_ip}/g" artifacts/kubeadm/.kube/config
+    EOF
   }
-
-  provisioner "file" {
-    source      = "artifacts/kubeadm"
-    destination = "/root"
-  }
+}
 
 
 resource "terraform_data" "master_init_containerd_upgrade" {
+  depends_on = [terraform_data.prepare_kubeconfig]
   for_each =  {for key, val in var.kubeadm_nodes:
                key => val if val.role == "master-init"}
   connection {
@@ -138,11 +135,7 @@ resource "terraform_data" "worker_containerd_upgrade" {
   provisioner "remote-exec" {
     inline = [<<EOF
 
-      # need to copy ssh key fist!!!!!!!!!!
-      # build master_ip 
-      mkdir -p $HOME/.kube
-      ssh -i $HOME/.ssh/id_rsa.key -o StrictHostKeyChecking=no ${master_ip} -- cat /etc/kubernetes/admin.conf > $HOME/.kube/config
-      sed -i "s/127\.0\.0\.1/{master_ip}/g" $HOME/.kube/config
+      cp -R kubeadm/.kube $HOME
 
       setenforce 0
       sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
@@ -163,7 +156,6 @@ resource "terraform_data" "worker_containerd_upgrade" {
       kubectl get node $(hostname) -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
       systemctl stop kubelet
       
-
       \cp kubeadm/kubelet.service /etc/systemd/system
       \cp -r kubeadm/kubelet.service.d /etc/systemd/system
 
