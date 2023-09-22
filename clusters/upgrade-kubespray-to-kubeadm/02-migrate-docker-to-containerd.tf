@@ -8,6 +8,8 @@ resource "terraform_data" "prepare_kubeconfig" {
   }
 }
 
+# TO-DO
+# Build template for remote upgrade script, seprarate from TF resource
 
 resource "terraform_data" "master_init_containerd_upgrade" {
   depends_on = [terraform_data.prepare_kubeconfig]
@@ -57,7 +59,6 @@ resource "terraform_data" "master_init_containerd_upgrade" {
       \cp -r kubeadm/kubelet.service.d /etc/systemd/system
 
       cat /var/lib/kubelet/kubeadm-flags.env | sed "s/unix:.*sock/unix:\/\/\/run\/containerd\/containerd.sock/g" > kf.env; mv -f kf.env /var/lib/kubelet/kubeadm-flags.env
-      # Need to setup crictl endpoint, image-endpoint
 
       crictl config runtime-endpoint unix:///run/containerd/containerd.sock
       crictl config image-endpoint
@@ -118,7 +119,6 @@ resource "terraform_data" "master_member_containerd_upgrade" {
       \cp -r kubeadm/kubelet.service.d /etc/systemd/system
 
       cat /var/lib/kubelet/kubeadm-flags.env | sed "s/unix:.*sock/unix:\/\/\/run\/containerd\/containerd.sock/g" > kf.env; mv -f kf.env /var/lib/kubelet/kubeadm-flags.env
-      # Need to setup crictl endpoint, image-endpoint
 
       crictl config runtime-endpoint unix:///run/containerd/containerd.sock
       crictl config image-endpoint
@@ -183,7 +183,6 @@ resource "terraform_data" "worker_containerd_upgrade" {
       \cp -r kubeadm/kubelet.service.d /etc/systemd/system
 
       cat /var/lib/kubelet/kubeadm-flags.env | sed "s/unix:.*sock/unix:\/\/\/run\/containerd\/containerd.sock/g" > kf.env; mv -f kf.env /var/lib/kubelet/kubeadm-flags.env
-      # Need to setup crictl endpoint, image-endpoint
 
       crictl config runtime-endpoint unix:///run/containerd/containerd.sock
       crictl config image-endpoint
