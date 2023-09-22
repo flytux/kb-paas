@@ -21,7 +21,7 @@ resource "tls_private_key" "generic-ssh-key" {
 }
 
 data "template_file" "cloud_inits" {
-  for_each = var.kubeadm_nodes
+  for_each = var.kubespray_nodes
   template = file("${path.module}/artifacts/config/cloud_init.cfg")
   vars = {
     hostname = each.key
@@ -33,7 +33,7 @@ data "template_file" "cloud_inits" {
 
 # OS images for libvirt VMs
 resource "libvirt_volume" "os_images" {
-  for_each = var.kubeadm_nodes
+  for_each = var.kubespray_nodes
   name   = "${each.key}.qcow2"
   pool   = var.disk_pool
   source = "artifacts/images/${var.cloud_image_name}"
@@ -54,7 +54,7 @@ resource "libvirt_volume" "os_images" {
 
 # Create cloud init disk
 resource "libvirt_cloudinit_disk" "cloudinit_disks" {
-  for_each = var.kubeadm_nodes
+  for_each = var.kubespray_nodes
   name           = "${each.key}-cloudinit.iso"
   pool           = var.disk_pool
   user_data      = data.template_file.cloud_inits[each.key].rendered

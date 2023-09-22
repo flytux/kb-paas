@@ -2,7 +2,7 @@ resource "local_file" "prepare-upgrade-master" {
     content     = templatefile("${path.module}/artifacts/templates/upgrade-master.sh", {
                     master_ip = var.master_ip
                    })
-    filename = "${path.module}/artifacts/kubeadm/upgrade-worker.sh"
+    filename = "${path.module}/artifacts/kubeadm/upgrade-master.sh"
 }
 
 resource "local_file" "prepare-upgrade-worker" {
@@ -10,7 +10,7 @@ resource "local_file" "prepare-upgrade-worker" {
     content     = templatefile("${path.module}/artifacts/templates/upgrade-worker.sh", {
                     master_ip = var.master_ip
                    })
-    filename = "${path.module}/artifacts/kubeadm/upgrade-worker.sh"
+    filename = "${path.module}/artifacts/kubeadm/upgrade-worker.sh" 
 }
 
 resource "terraform_data" "prepare_script" {

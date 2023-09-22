@@ -1,7 +1,7 @@
 # Create the machine
-resource "libvirt_domain" "kubeadm_nodes" {
+resource "libvirt_domain" "kubespray_node" {
   depends_on = [libvirt_volume.os_images]
-  for_each = var.kubeadm_nodes
+  for_each = var.kubespray_nodes
   # domain name in libvirt
   name   = "${each.key}-${var.prefix_ip}.${each.value.octetIP}"
   memory = each.value.memoryMB

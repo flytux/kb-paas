@@ -17,7 +17,7 @@ variable "qemu_connect" { default = "qemu:///system" }
 
 variable "join_cmd" { default = "$(ssh -i $HOME/.ssh/id_rsa.key -o StrictHostKeyChecking=no 101.101.101.101 -- cat join_cmd)" }
 
-variable "kubeadm_nodes" { 
+variable "kubespray_nodes" { 
 
   type = map(object({ role = string, octetIP = string , vcpu = number, memoryMB = number, incGB = number}))
   default = { 
