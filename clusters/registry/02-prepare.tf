@@ -36,7 +36,7 @@ resource "libvirt_volume" "os_images" {
   for_each = var.kubeadm_nodes
   name   = "${each.key}.qcow2"
   pool   = var.disk_pool
-  source = "artifacts/images/${var.cloud_image_name}"
+  source = "../deploy/artifacts/images/${var.cloud_image_name}"
   format = "qcow2"
 
 # Extend libvirt primary volume

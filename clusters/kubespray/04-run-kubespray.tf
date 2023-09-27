@@ -4,7 +4,7 @@ resource "local_file" "prepare-kubespray-script" {
                     prefix_ip = var.prefix_ip
                     nodes = var.kubespray_nodes
                    })
-    filename = "${path.module}/artifacts/run-kubespray.sh"
+    filename = "${path.module}/artifacts/scripts/run-kubespray.sh"
 }
 
 resource "terraform_data" "run_kubespray" {
@@ -23,7 +23,7 @@ resource "terraform_data" "run_kubespray" {
   }
 
   provisioner "file" {
-  source      = "artifacts/run-kubespray.sh"
+  source      = "artifacts/scripts/run-kubespray.sh"
   destination = "run-kubespray.sh"
   }
 

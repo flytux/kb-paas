@@ -35,6 +35,7 @@ data "template_file" "cloud_inits" {
 resource "libvirt_volume" "os_images" {
   for_each = var.kubespray_nodes
   name   = "${each.key}.qcow2"
+  # https://download.rockylinux.org/pub/rocky/8/images/x86_64/
   pool   = var.disk_pool
   source = "artifacts/images/${var.cloud_image_name}"
   format = "qcow2"

@@ -8,7 +8,7 @@ OLD_VERSION=$(/usr/local/bin/kubeadm version | grep -oE 'v([1-9]|\.)+')
 
 echo "=== check kubeadm plan ==="
 mv /usr/local/bin/kubeadm kubeadm-$OLD_VERSION
-cp kubeadm/$NEW_VERSION/kubeadm /usr/local/bin/kubeadm && chmod +x /usr/local/bin/kubeadm
+cp kubeadm/kubernetes/$NEW_VERSION/kubeadm /usr/local/bin/kubeadm && chmod +x /usr/local/bin/kubeadm
 
 kubeadm upgrade plan
 
@@ -25,7 +25,7 @@ echo "=== stop kubelet.service ==="
 systemctl stop kubelet.service
 
 echo "=== copy new version kubelet and restart"
-cp kubeadm/$NEW_VERSION/kubelet /usr/local/bin/kubelet && chmod +x /usr/local/bin/kubelet
+cp kubeadm/kubernetes/$NEW_VERSION/kubelet /usr/local/bin/kubelet && chmod +x /usr/local/bin/kubelet
 
 echo "=== restart kubelet.service ==="
 systemctl daemon-reload

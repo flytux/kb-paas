@@ -45,31 +45,32 @@ resource "terraform_data" "copy_installer" {
   provisioner "remote-exec" {
     inline = [<<EOF
        
+      # Disble SELINUX 
       setenforce 0
       sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 
-      echo "192.168.122.51 docker.kw01" >> /etc/hosts
-
+      # Install required packages
       rpm -Uvh kubeadm/packages/*.rpm
 
-      cp kubeadm/packages/registry.* /etc/pki/ca-trust/source/anchors/
-      update-ca-trust
-
+      # Install containerd
       mkdir -p /etc/containerd
       cp kubeadm/packages/config.toml /etc/containerd/
       mkdir -p /etc/nerdctl
-      cp kubeadm/bin/nerdctl.toml /etc/nerdctl/nerdctl.toml
+      cp kubeadm/kubernetes/config/nerdctl.toml /etc/nerdctl/nerdctl.toml
 
       systemctl restart containerd
 
-      cp kubeadm/bin/* /usr/local/bin
+      # Copy kubeadm and network binaries
+      cp kubeadm/kubernetes/bin/* /usr/local/bin
       chmod +x /usr/local/bin/*
       cp -R kubeadm/cni /opt
 
-      nerdctl load -i kubeadm/kubeadm.tar
+      # Load kubeadm container images
+      nerdctl load -i kubeadm/images/kubeadm.tar
 
-      cp kubeadm/kubelet.service /etc/systemd/system
-      mv kubeadm/kubelet.service.d /etc/systemd/system
+      # Configure and start kubelet
+      cp kubeadm/kubernetes/config/kubelet.service /etc/systemd/system
+      mv kubeadm/kubernetes/config/kubelet.service.d /etc/systemd/system
 
       systemctl daemon-reload
       systemctl enable kubelet --now
@@ -94,6 +95,8 @@ resource "terraform_data" "init_master" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
+           
+           # Start kubeadm init
            chmod +x ./kubeadm/master-init.sh
            ./kubeadm/master-init.sh
     EOF
@@ -117,6 +120,8 @@ resource "terraform_data" "add_master" {
 
   provisioner "remote-exec" {
   inline = [<<EOF
+
+           # Start kubeadm init
            chmod +x ./kubeadm/master-member.sh
            ./kubeadm/master-member.sh
     EOF
@@ -139,6 +144,8 @@ resource "terraform_data" "add_worker" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
+
+           # Start kubeadm join
            chmod +x ./kubeadm/worker.sh
            ./kubeadm/worker.sh
     EOF

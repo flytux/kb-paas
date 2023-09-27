@@ -6,13 +6,27 @@ resource "terraform_data" "prepare_kubeconfig" {
       sed -i "s/127\.0\.0\.1/${var.master_ip}/g" artifacts/kubeadm/.kube/config
     EOF
   }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<EOF
+      rm -rvf artifacts/kubeadm/.kube
+    EOF
+  }
 }
 
-# TO-DO
-# Build template for remote upgrade script, seprarate from TF resource
+
+resource "local_file" "prepare_migrate_to_containerd" {
+  depends_on = [terraform_data.prepare_kubeconfig]
+    content     = templatefile("${path.module}/artifacts/templates/migrate-to-containerd.sh", {
+                    master_ip = var.master_ip
+                  })
+    filename = "${path.module}/artifacts/kubeadm/scripts/migrate-to-containerd.sh"
+}
+
 
 resource "terraform_data" "master_init_containerd_upgrade" {
-  depends_on = [terraform_data.prepare_kubeconfig]
+  depends_on = [local_file.prepare_migrate_to_containerd]
   for_each =  {for key, val in var.kubeadm_nodes:
                key => val if val.role == "master-init"}
   connection {
@@ -30,43 +44,9 @@ resource "terraform_data" "master_init_containerd_upgrade" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
+
+      sh kubeadm/scripts/migrate-to-containerd.sh
        
-      setenforce 0
-      sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
-      
-      
-      echo "=== install rpms  ==="
-      rpm -Uvh kubeadm/packages/*.rpm
-
-      mkdir -p /etc/containerd
-      \cp kubeadm/packages/config.toml /etc/containerd/
-
-      mkdir -p /etc/nerdctl
-      cp kubeadm/bin/nerdctl.toml /etc/nerdctl/nerdctl.toml
-      systemctl restart containerd
-      
-      \cp kubeadm/bin/nerdctl /usr/local/bin && chmod +x /usr/local/bin/*
-      nerdctl load -i kubeadm/kubeadm.tar
-
-      \cp -rf kubeadm/cni /opt
-
-      echo "=== change container runtime annotaion of nodes  ==="
-      kubectl get node $(hostname) -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
-      systemctl stop kubelet
-      
-
-      \cp kubeadm/kubelet.service /etc/systemd/system
-      \cp -r kubeadm/kubelet.service.d /etc/systemd/system
-
-      cat /var/lib/kubelet/kubeadm-flags.env | sed "s/unix:.*sock/unix:\/\/\/run\/containerd\/containerd.sock/g" > kf.env; mv -f kf.env /var/lib/kubelet/kubeadm-flags.env
-
-      crictl config runtime-endpoint unix:///run/containerd/containerd.sock
-      crictl config image-endpoint
-      
-      systemctl daemon-reload
-      systemctl enable kubelet --now
-      systemctl disable docker.service --now
-
     EOF
     ]
   }
@@ -91,41 +71,8 @@ resource "terraform_data" "master_member_containerd_upgrade" {
 
   provisioner "remote-exec" {
     inline = [<<EOF
-       
-      setenforce 0
-      sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 
-      echo "=== install rpms  ==="
-      rpm -Uvh kubeadm/packages/*.rpm
-
-      mkdir -p /etc/containerd
-      \cp kubeadm/packages/config.toml /etc/containerd/
-
-      mkdir -p /etc/nerdctl
-      cp kubeadm/bin/nerdctl.toml /etc/nerdctl/nerdctl.toml
-      systemctl restart containerd
-
-      \cp kubeadm/bin/nerdctl /usr/local/bin && chmod +x /usr/local/bin/*
-      nerdctl load -i kubeadm/kubeadm.tar
-
-      \cp -rf kubeadm/cni /opt
-
-      echo "=== change container runtime annotaion of nodes  ==="
-      kubectl get node $(hostname) -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
-      systemctl stop kubelet
-      
-
-      \cp kubeadm/kubelet.service /etc/systemd/system
-      \cp -r kubeadm/kubelet.service.d /etc/systemd/system
-
-      cat /var/lib/kubelet/kubeadm-flags.env | sed "s/unix:.*sock/unix:\/\/\/run\/containerd\/containerd.sock/g" > kf.env; mv -f kf.env /var/lib/kubelet/kubeadm-flags.env
-
-      crictl config runtime-endpoint unix:///run/containerd/containerd.sock
-      crictl config image-endpoint
-      
-      systemctl daemon-reload
-      systemctl enable kubelet --now
-      systemctl disable docker.service --now
+      sh kubeadm/scripts/migrate-to-containerd.sh
 
     EOF
     ]
@@ -154,43 +101,7 @@ resource "terraform_data" "worker_containerd_upgrade" {
 
       cp -R kubeadm/.kube $HOME
 
-      setenforce 0
-      sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
-
-      echo "=== install rpms  ==="
-      rpm -Uvh kubeadm/packages/*.rpm
-
-      mkdir -p /etc/containerd
-      \cp kubeadm/packages/config.toml /etc/containerd/
-
-      mkdir -p /etc/nerdctl
-      cp kubeadm/bin/nerdctl.toml /etc/nerdctl/nerdctl.toml
-      systemctl restart containerd
-
-      \cp kubeadm/bin/nerdctl /usr/local/bin && chmod +x /usr/local/bin/*
-      nerdctl load -i kubeadm/kubeadm.tar
-
-      \cp -rf kubeadm/cni /opt
-
-      \cp kubeadm/bin/kubectl /usr/local/bin
-      echo "=== change container runtime annotaion of nodes  ==="
-      \cp kubeadm/bin/kubectl /usr/local/bin && chmod +x /usr/local/bin/*
-
-      kubectl get node $(hostname) -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
-      systemctl stop kubelet
-      
-      \cp kubeadm/kubelet.service /etc/systemd/system
-      \cp -r kubeadm/kubelet.service.d /etc/systemd/system
-
-      cat /var/lib/kubelet/kubeadm-flags.env | sed "s/unix:.*sock/unix:\/\/\/run\/containerd\/containerd.sock/g" > kf.env; mv -f kf.env /var/lib/kubelet/kubeadm-flags.env
-
-      crictl config runtime-endpoint unix:///run/containerd/containerd.sock
-      crictl config image-endpoint
-
-      
-      systemctl daemon-reload
-      systemctl enable kubelet --now
-      systemctl disable docker.service --now
+      sh kubeadm/scripts/migrate-to-containerd.sh
 
     EOF
     ]

@@ -7,3 +7,4 @@ kubectl
 *.pub
 .terraform
 *.qcow2
+terraform.tfstate*
