@@ -15,3 +15,4 @@ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1
 sleep 5 #wait for the deployment to start the required pods
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/custom-resources.yaml
 sleep 5 #wait for the deployment to start the required pods
+kubectl taint nodes --all node-role.kubernetes.io/control-plane:NoSchedule-

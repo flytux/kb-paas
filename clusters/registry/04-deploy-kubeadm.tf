@@ -2,7 +2,7 @@ resource "local_file" "master_init" {
     content     = templatefile("${path.module}/artifacts/templates/master-init.sh", {
                     master_ip = var.master_ip
                    })
-    filename = "${path.module}/artifacts/kubeadm/master-init.sh"
+    filename = "${path.module}/artifacts/kubeadm/scripts/master-init.sh"
 }
 
 resource "local_file" "master_member" {
@@ -10,7 +10,7 @@ resource "local_file" "master_member" {
     content     = templatefile("${path.module}/artifacts/templates/master-member.sh", {
 		    master_ip = var.master_ip
 		   })
-    filename = "${path.module}/artifacts/kubeadm/master-member.sh"
+    filename = "${path.module}/artifacts/kubeadm/scripts/master-member.sh"
 }
 
 resource "local_file" "worker" {
@@ -18,7 +18,7 @@ resource "local_file" "worker" {
     content     = templatefile("${path.module}/artifacts/templates/worker.sh", {
 		    master_ip = var.master_ip
 		   })
-    filename = "${path.module}/artifacts/kubeadm/worker.sh"
+    filename = "${path.module}/artifacts/kubeadm/scripts/worker.sh"
 }
 
 resource "terraform_data" "copy_installer" {
@@ -97,8 +97,8 @@ resource "terraform_data" "init_master" {
     inline = [<<EOF
            
            # Start kubeadm init
-           chmod +x ./kubeadm/master-init.sh
-           ./kubeadm/master-init.sh
+           chmod +x kubeadm/scripts/master-init.sh
+           kubeadm/scripts/master-init.sh
     EOF
     ]
   }
@@ -122,8 +122,8 @@ resource "terraform_data" "add_master" {
   inline = [<<EOF
 
            # Start kubeadm init
-           chmod +x ./kubeadm/master-member.sh
-           ./kubeadm/master-member.sh
+           chmod +x kubeadm/scripts/master-member.sh
+           kubeadm/scripts/master-member.sh
     EOF
     ]
   }
@@ -146,8 +146,8 @@ resource "terraform_data" "add_worker" {
     inline = [<<EOF
 
            # Start kubeadm join
-           chmod +x ./kubeadm/worker.sh
-           ./kubeadm/worker.sh
+           chmod +x kubeadm/scripts/worker.sh
+           kubeadm/scripts/worker.sh
     EOF
     ]
   }
