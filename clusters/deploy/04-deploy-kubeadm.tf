@@ -47,7 +47,7 @@ resource "terraform_data" "copy_installer" {
        
       # Disble SELINUX 
       setenforce 0
-      sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+      sed -i --follow-symlinks 's/SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux
 
       # Install required packages
       rpm -Uvh kubeadm/packages/*.rpm
