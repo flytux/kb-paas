@@ -10,6 +10,8 @@ echo "=== check kubeadm plan ==="
 cp kubeadm/kubernetes/$NEW_VERSION/kubeadm /usr/local/bin/kubeadm && chmod +x /usr/local/bin/kubeadm
 
 echo "=== upgrade node ==="
+crictl config image-endpoint
+
 kubeadm upgrade node 
 
 echo "=== drain node ==="

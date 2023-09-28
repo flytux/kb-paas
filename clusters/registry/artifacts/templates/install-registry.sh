@@ -18,17 +18,15 @@ kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisione
 kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
 # Generate registry certs
-openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout registry.key -out registry.crt \
--subj "/CN=docker.kw01" -addext "subjectAltName=DNS:docker.kw01,DNS:*.kw01,IP:${master_ip}"
 
-cp registry.* /etc/pki/ca-trust/source/anchors/
+cp kubeadm/certs/* /etc/pki/ca-trust/source/anchors/
 update-ca-trust
 
 echo "${master_ip}  docker.kw01" >> /etc/hosts
 
 # Create secret certs
 kubectl create ns registry
-kubectl create secret tls docker-tls -n registry --cert=registry.crt --key=registry.key
+kubectl create secret tls docker-tls -n registry --cert=kubeadm/certs/registry.crt --key=kubeadm/certs/registry.key
 
 # Create registry values
 cat << EOF > values.yaml
@@ -42,6 +40,8 @@ ingress:
     - secretName: docker-tls
       hosts:
         - docker.kw01
+  annotations: 
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
 persistence:
   accessMode: 'ReadWriteOnce'
   enabled: true

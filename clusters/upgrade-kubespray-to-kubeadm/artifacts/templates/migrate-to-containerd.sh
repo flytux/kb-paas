@@ -1,13 +1,18 @@
 #!/bin/sh
 
 setenforce 0
-sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+sed -i --follow-symlinks 's/SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux
 
 echo "=== install rpms  ==="
 rpm -Uvh kubeadm/packages/*.rpm
 
 mkdir -p /etc/containerd
 \cp kubeadm/packages/config.toml /etc/containerd/
+
+echo "=== update registry ca certs ==="
+cp kubeadm/certs/* /etc/pki/ca-trust/source/anchors/
+update-ca-trust
+echo "${registry_ip} ${registry_domain}" >> /etc/hosts
 
 mkdir -p /etc/nerdctl
 cp kubeadm/kubernetes/config/nerdctl.toml /etc/nerdctl/nerdctl.toml
@@ -19,7 +24,7 @@ nerdctl load -i kubeadm/images/kubeadm.tar
 \cp -rf kubeadm/cni /opt
 
 echo "=== change container runtime annotaion of nodes  ==="
-kubectl get node $(hostname) -o yaml | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
+kubectl get node $(hostname) -o yaml | sed "/creationTimestamp.*/d" | sed "/resourceVersion.*/d" | sed "/uid.*/d" | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
 systemctl stop kubelet
 
 \cp kubeadm/kubernetes/config/kubelet.service /etc/systemd/system

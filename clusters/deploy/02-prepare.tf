@@ -9,6 +9,8 @@ resource "tls_private_key" "generic-ssh-key" {
       echo "${tls_private_key.generic-ssh-key.public_key_openssh}" > .ssh-${terraform.workspace}/id_rsa.pub
       chmod 400 .ssh-${terraform.workspace}/id_rsa.key
       chmod 400 .ssh-${terraform.workspace}/id_rsa.key
+
+      cp ../registry/artifacts/kubeadm/certs/* artifacts/kubeadm/certs
     EOF
   }
 
@@ -16,6 +18,7 @@ resource "tls_private_key" "generic-ssh-key" {
     when    = destroy
     command = <<EOF
       rm -rvf .ssh-${terraform.workspace}/
+      rm -rff artifacts/kubeadm/certs/*
     EOF
   }
 }

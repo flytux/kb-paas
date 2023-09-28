@@ -25,7 +25,7 @@ resource "terraform_data" "upgrade_master_init" {
   }
 
   provisioner "file" {
-  source      = "artifacts/kubeadm/${var.new_version}"
+  source      = "artifacts/kubeadm/kubernetes/${var.new_version}"
   destination = "/root/kubeadm"
   }
 
@@ -58,7 +58,7 @@ resource "terraform_data" "upgrade_master_member" {
   }
 
   provisioner "file" {
-  source      = "artifacts/kubeadm/${var.new_version}"
+  source      = "artifacts/kubeadm/kubernetes/${var.new_version}"
   destination = "/root/kubeadm"
   }
 
@@ -99,7 +99,7 @@ resource "terraform_data" "upgrade-worker" {
   }
 
   provisioner "file" {
-  source      = "artifacts/kubeadm/${var.new_version}"
+  source      = "artifacts/kubeadm/kubernetes/${var.new_version}"
   destination = "/root/kubeadm"
   }
 

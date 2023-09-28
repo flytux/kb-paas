@@ -4,6 +4,10 @@ variable "master_ip" { default = "101.101.101.101" }
 
 variable "new_version" { default = "v1.27.6" }
 
+variable "registry_ip" { default = "10.10.10.101" }
+
+variable "registry_domain" { default = "docker.kw01" }
+
 variable "kubeadm_nodes" { 
 
   type = map(object({ role = string, octetIP = string , vcpu = number, memoryMB = number, incGB = number}))

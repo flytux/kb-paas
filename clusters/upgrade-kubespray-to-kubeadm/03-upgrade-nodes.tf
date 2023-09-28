@@ -1,4 +1,5 @@
 resource "local_file" "prepare-upgrade-master" {
+  depends_on = [terraform_data.worker_containerd_upgrade]
     content     = templatefile("${path.module}/artifacts/templates/upgrade-master.sh", {
                     master_ip = var.master_ip
                    })
@@ -51,8 +52,8 @@ resource "terraform_data" "upgrade_master_init" {
 
   provisioner "remote-exec" {
   inline = [<<EOF
-      chmod +x ./kubeadm/scripts/upgrade-master.sh
-      sudo ./kubeadm/scripts/upgrade-master.sh
+      chmod +x kubeadm/scripts/upgrade-master.sh
+      sh kubeadm/scripts/upgrade-master.sh
     EOF
     ]
   }
@@ -79,8 +80,8 @@ resource "terraform_data" "upgrade_master_member" {
 
   provisioner "remote-exec" {
   inline = [<<EOF
-      chmod +x ./kubeadm/scripts/upgrade-master.sh
-      sudo ./kubeadm/scripts/upgrade-master.sh
+      chmod +x kubeadm/scripts/upgrade-master.sh
+      sh kubeadm/scripts/upgrade-master.sh
     EOF
     ]
   }
@@ -104,11 +105,16 @@ resource "terraform_data" "upgrade-worker" {
   destination = "/root/kubeadm/scripts/upgrade-worker.sh"
   }
 
+  provisioner "file" {
+  source      = "../kubespray/.ssh-default/id_rsa.key"
+  destination = "/root/.ssh/id_rsa.key"
+  }
+
   provisioner "remote-exec" {
   inline = [<<EOF
 
-      chmod +x ./kubeadm/scripts/upgrade-worker.sh
-      sudo ./kubeadm/scripts/upgrade-worker.sh
+      chmod +x kubeadm/scripts/upgrade-worker.sh
+      sh kubeadm/scripts/upgrade-worker.sh
 
     EOF
     ]

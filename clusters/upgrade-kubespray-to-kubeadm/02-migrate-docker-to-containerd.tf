@@ -4,6 +4,8 @@ resource "terraform_data" "prepare_kubeconfig" {
       mkdir artifacts/kubeadm/.kube
       ssh -i ../kubespray/.ssh-default/id_rsa.key -o StrictHostKeyChecking=no ${var.master_ip} -- cat /etc/kubernetes/admin.conf > artifacts/kubeadm/.kube/config
       sed -i "s/127\.0\.0\.1/${var.master_ip}/g" artifacts/kubeadm/.kube/config
+
+      cp ../registry/artifacts/kubeadm/certs/* artifacts/kubeadm/certs
     EOF
   }
 
@@ -19,7 +21,8 @@ resource "terraform_data" "prepare_kubeconfig" {
 resource "local_file" "prepare_migrate_to_containerd" {
   depends_on = [terraform_data.prepare_kubeconfig]
     content     = templatefile("${path.module}/artifacts/templates/migrate-to-containerd.sh", {
-                    master_ip = var.master_ip
+                    registry_ip = var.registry_ip
+                    registry_domain = var.registry_domain
                   })
     filename = "${path.module}/artifacts/kubeadm/scripts/migrate-to-containerd.sh"
 }

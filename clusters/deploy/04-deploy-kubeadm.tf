@@ -55,6 +55,13 @@ resource "terraform_data" "copy_installer" {
       # Install containerd
       mkdir -p /etc/containerd
       cp kubeadm/packages/config.toml /etc/containerd/
+
+      # Update registry ca-certs, dns
+      cp kubeadm/certs/* /etc/pki/ca-trust/source/anchors/
+      update-ca-trust
+
+      echo "10.10.10.101 docker.kw01" >> /etc/hosts
+
       mkdir -p /etc/nerdctl
       cp kubeadm/kubernetes/config/nerdctl.toml /etc/nerdctl/nerdctl.toml
 
