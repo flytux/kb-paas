@@ -49,5 +49,5 @@ persistence:
 EOF
 # Install registry 
 helm repo add twuni https://helm.twun.io
-
-helm template docker-registry twuni/docker-registry -n registry -f values.yaml | kubectl apply -f -
+kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
+helm upgrade -i docker-registry twuni/docker-registry -n registry -f values.yaml 
