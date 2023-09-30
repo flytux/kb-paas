@@ -1,0 +1,9 @@
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  variant: Calico
+  imagePullSecrets:
+    - name: docker-kw01-secret
+      registry: docker.kw01

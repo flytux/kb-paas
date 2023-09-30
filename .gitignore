@@ -1,7 +1,6 @@
 kubeadm.tar
 *.img
 kubelet
-kubeadm
 kubectl
 *.key
 *.pub
