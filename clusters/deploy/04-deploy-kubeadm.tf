@@ -1,24 +1,32 @@
-resource "local_file" "master_init" {
-    content     = templatefile("${path.module}/artifacts/templates/master-init.sh", {
+resource "local_file" "prepare_kubeadm" {
+    content     = templatefile("${path.module}/${var.kubeadm_home}/templates/prepare-kubeadm.sh", {
                     master_ip = var.master_ip
                    })
-    filename = "${path.module}/artifacts/kubeadm/master-init.sh"
+    filename = "${path.module}/${var.kubeadm_home}/scripts/prepare-kubeadm.sh"
+}
+
+resource "local_file" "master_init" {
+  depends_on = [local_file.prepare_kubeadm]
+    content     = templatefile("${path.module}/${var.kubeadm_home}/templates/master-init.sh", {
+                    master_ip = var.master_ip
+                   })
+    filename = "${path.module}/${var.kubeadm_home}/scripts/master-init.sh"
 }
 
 resource "local_file" "master_member" {
   depends_on = [local_file.master_init]
-    content     = templatefile("${path.module}/artifacts/templates/master-member.sh", {
+    content     = templatefile("${path.module}/${var.kubeadm_home}/templates/master-member.sh", {
 		    master_ip = var.master_ip
 		   })
-    filename = "${path.module}/artifacts/kubeadm/master-member.sh"
+    filename = "${path.module}/${var.kubeadm_home}/scripts/master-member.sh"
 }
 
 resource "local_file" "worker" {
   depends_on = [local_file.master_member]
-    content     = templatefile("${path.module}/artifacts/templates/worker.sh", {
+    content     = templatefile("${path.module}/${var.kubeadm_home}/templates/worker.sh", {
 		    master_ip = var.master_ip
 		   })
-    filename = "${path.module}/artifacts/kubeadm/worker.sh"
+    filename = "${path.module}/${var.kubeadm_home}/scripts/worker.sh"
 }
 
 resource "terraform_data" "copy_installer" {
@@ -33,7 +41,7 @@ resource "terraform_data" "copy_installer" {
   }
 
   provisioner "file" {
-    source      = "artifacts/kubeadm"
+    source      = "${var.kubeadm_home}"
     destination = "/root"
   }
 
@@ -45,42 +53,8 @@ resource "terraform_data" "copy_installer" {
   provisioner "remote-exec" {
     inline = [<<EOF
        
-      # Disble SELINUX 
-      setenforce 0
-      sed -i --follow-symlinks 's/SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux
-
-      # Install required packages
-      rpm -Uvh kubeadm/packages/*.rpm
-
-      # Install containerd
-      mkdir -p /etc/containerd
-      cp kubeadm/packages/config.toml /etc/containerd/
-
-      # Update registry ca-certs, dns
-      cp kubeadm/certs/* /etc/pki/ca-trust/source/anchors/
-      update-ca-trust
-
-      echo "10.10.10.101 docker.kw01" >> /etc/hosts
-
-      mkdir -p /etc/nerdctl
-      cp kubeadm/kubernetes/config/nerdctl.toml /etc/nerdctl/nerdctl.toml
-
-      systemctl restart containerd
-
-      # Copy kubeadm and network binaries
-      cp kubeadm/kubernetes/bin/* /usr/local/bin
-      chmod +x /usr/local/bin/*
-      cp -R kubeadm/cni /opt
-
-      # Load kubeadm container images
-      nerdctl load -i kubeadm/images/kubeadm.tar
-
-      # Configure and start kubelet
-      cp kubeadm/kubernetes/config/kubelet.service /etc/systemd/system
-      mv kubeadm/kubernetes/config/kubelet.service.d /etc/systemd/system
-
-      systemctl daemon-reload
-      systemctl enable kubelet --now
+      chmod +x kubeadm/scripts/prepare-kubeadm.sh
+      kubeadm/scripts/prepare-kubeadm.sh
 
     EOF
     ]
@@ -104,8 +78,8 @@ resource "terraform_data" "init_master" {
     inline = [<<EOF
            
            # Start kubeadm init
-           chmod +x ./kubeadm/master-init.sh
-           ./kubeadm/master-init.sh
+           chmod +x kubeadm/scripts/master-init.sh
+           kubeadm/scripts/master-init.sh
     EOF
     ]
   }
@@ -129,8 +103,8 @@ resource "terraform_data" "add_master" {
   inline = [<<EOF
 
            # Start kubeadm init
-           chmod +x ./kubeadm/master-member.sh
-           ./kubeadm/master-member.sh
+           chmod +x kubeadm/scripts/master-member.sh
+           kubeadm/scripts/master-member.sh
     EOF
     ]
   }
@@ -153,8 +127,8 @@ resource "terraform_data" "add_worker" {
     inline = [<<EOF
 
            # Start kubeadm join
-           chmod +x ./kubeadm/worker.sh
-           ./kubeadm/worker.sh
+           chmod +x kubeadm/scripts/worker.sh
+           kubeadm/scripts/worker.sh
     EOF
     ]
   }
