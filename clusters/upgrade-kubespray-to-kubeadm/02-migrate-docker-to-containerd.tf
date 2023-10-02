@@ -21,8 +21,10 @@ resource "terraform_data" "prepare_kubeconfig" {
 resource "local_file" "prepare_migrate_to_containerd" {
   depends_on = [terraform_data.prepare_kubeconfig]
     content     = templatefile("${path.module}/artifacts/templates/migrate-to-containerd.sh", {
-                    registry_ip = var.registry_ip
-                    registry_domain = var.registry_domain
+                    registry_ip = var.registry_ip,
+                    registry_domain = var.registry_domain,
+                    yum_ip = var.yum_ip,
+                    yum_domain = var.yum_domain
                   })
     filename = "${path.module}/artifacts/kubeadm/scripts/migrate-to-containerd.sh"
 }

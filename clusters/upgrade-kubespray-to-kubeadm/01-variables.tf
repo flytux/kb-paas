@@ -6,7 +6,11 @@ variable "new_version" { default = "v1.27.6" }
 
 variable "registry_ip" { default = "10.10.10.101" }
 
+variable "yum_ip" { default = "10.10.10.101" }
+
 variable "registry_domain" { default = "docker.kw01" }
+
+variable "yum_domain" { default = "repo.kw01" }
 
 variable "kubeadm_nodes" { 
 

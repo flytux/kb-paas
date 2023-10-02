@@ -18,6 +18,12 @@ variable "join_cmd" { default = "$(ssh -i $HOME/.ssh/id_rsa.key -o StrictHostKey
 
 variable "kubeadm_home" { default = "artifacts/kubeadm" }
 
+variable "yum_ip" { default = "10.10.10.101" }
+
+variable "yum_domain" { default = "repo.kw01" }
+
+variable "registry_domain" { default = "docker.kw01" }
+
 variable "kubeadm_nodes" { 
 
   type = map(object({ role = string, octetIP = string , vcpu = number, memoryMB = number, incGB = number}))

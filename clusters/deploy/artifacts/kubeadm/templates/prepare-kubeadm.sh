@@ -5,17 +5,29 @@ setenforce 0
 sed -i --follow-symlinks 's/SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux
 
 # Install required packages
+echo "${yum_ip}  ${yum_domain} ${registry_domain}" >> /etc/hosts
+
+echo "=== update registry ca certs ==="
+cp kubeadm/certs/* /etc/pki/ca-trust/source/anchors/
+update-ca-trust
 
 #rpm -Uvh kubeadm/packages/*.rpm
+rm -rf /etc/yum.repos.d/Rocky*
 cat << EOF > /etc/yum.repos.d/kw01.repo
 [kw01]
 name=kw01
-baseurl=http://repo.kw01/repo/
+baseurl=http://${yum_domain}/repo/
 gpgcheck=0
 enabled=1
+module_hotfixes=1
 EOF
 
-yum install -y kubeadm/packages/*.rpm
+rm -rf /etc/yum.repos.d/Rocky*
+
+#yum install -y containerd.io socat conntrack iproute-tc iptables-ebtables iptables
+yum install -y containerd.io socat conntrack iproute-tc iptables-ebtables --downloadonly --downloaddir=kubeadm/packages
+yum remove -y containerd.io socat conntrack iproute-tc iptables-ebtables 
+rpm -Uvh kubeadm/packages/*.rpm
 
 # Install containerd
 mkdir -p /etc/containerd

@@ -4,15 +4,30 @@ setenforce 0
 sed -i --follow-symlinks 's/SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux
 
 echo "=== install rpms  ==="
-rpm -Uvh kubeadm/packages/*.rpm
-
-mkdir -p /etc/containerd
-\cp kubeadm/packages/config.toml /etc/containerd/
+ # Install required packages
+echo "${yum_ip}  ${yum_domain} ${registry_domain}" >> /etc/hosts
 
 echo "=== update registry ca certs ==="
 cp kubeadm/certs/* /etc/pki/ca-trust/source/anchors/
 update-ca-trust
-echo "${registry_ip} ${registry_domain}" >> /etc/hosts
+
+#rpm -Uvh kubeadm/packages/*.rpm
+rm -rf /etc/yum.repos.d/Rocky*
+cat << EOF > /etc/yum.repos.d/kw01.repo
+[kw01]
+name=kw01
+baseurl=http://${yum_domain}/repo/
+gpgcheck=0
+enabled=1
+module_hotfixes=1
+EOF
+
+yum install -y containerd.io socat conntrack iproute-tc iptables-ebtables --downloadonly --downloaddir=kubeadm/packages
+yum remove -y containerd.io container-selinux socat conntrack iproute-tc iptables-ebtables
+rpm -Uvh kubeadm/packages/*.rpm
+
+mkdir -p /etc/containerd
+\cp kubeadm/packages/config.toml /etc/containerd/
 
 mkdir -p /etc/nerdctl
 cp kubeadm/kubernetes/config/nerdctl.toml /etc/nerdctl/nerdctl.toml

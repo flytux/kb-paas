@@ -7,3 +7,5 @@ kubectl
 .terraform
 *.qcow2
 terraform.tfstate*
+registry.crt
+registry.key

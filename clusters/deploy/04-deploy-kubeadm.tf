@@ -1,6 +1,8 @@
 resource "local_file" "prepare_kubeadm" {
     content     = templatefile("${path.module}/${var.kubeadm_home}/templates/prepare-kubeadm.sh", {
-                    master_ip = var.master_ip
+                    yum_ip = var.yum_ip,
+                    yum_domain = var.yum_domain,
+                    registry_domain = var.registry_domain
                    })
     filename = "${path.module}/${var.kubeadm_home}/scripts/prepare-kubeadm.sh"
 }
@@ -39,6 +41,13 @@ resource "terraform_data" "copy_installer" {
     private_key = "${tls_private_key.generic-ssh-key.private_key_openssh}"
     timeout     = "2m"
   }
+
+  provisioner "local-exec" {
+    command = <<EOF
+    cp ../registry/artifacts/kubeadm/certs/* ${var.kubeadm_home}/certs/
+    EOF
+  }
+
 
   provisioner "file" {
     source      = "${var.kubeadm_home}"
