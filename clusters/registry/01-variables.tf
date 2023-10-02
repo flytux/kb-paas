@@ -33,5 +33,5 @@ variable "registry_ip" { default = "10.10.10.101" }
 
 variable "registry_domain" { default = "docker.kw01" }
 
-# Minio host config
-variable "minio_domain" { default = "minio.kw01" }
+# yum repo config
+variable "yum_domain" { default = "repo.kw01" }

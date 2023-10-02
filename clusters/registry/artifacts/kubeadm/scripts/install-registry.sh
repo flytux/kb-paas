@@ -22,7 +22,7 @@ kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storagec
 cp kubeadm/certs/* /etc/pki/ca-trust/source/anchors/
 update-ca-trust
 
-echo "${registry_ip}  ${registry_domain}" >> /etc/hosts
+echo "10.10.10.101  docker.kw01" >> /etc/hosts
 
 # Create secret certs
 kubectl create ns registry
@@ -35,11 +35,11 @@ ingress:
   className: nginx
   path: /
   hosts:
-    - ${registry_domain}
+    - docker.kw01
   tls:
     - secretName: docker-tls
       hosts:
-        - ${registry_domain}
+        - docker.kw01
   annotations: 
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 persistence:
