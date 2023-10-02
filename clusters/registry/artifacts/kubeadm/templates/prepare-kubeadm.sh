@@ -4,8 +4,11 @@
 setenforce 0
 sed -i --follow-symlinks 's/SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux
 
+# Add minio hostname
+echo "${master_ip} ${minio_domain}" >> /etc/hosts
+
 # Install required packages
-rpm -Uvh kubeadm/packages/*.rpm
+yum install -y kubeadm/packages/*.rpm
 
 # Install containerd
 mkdir -p /etc/containerd
