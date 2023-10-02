@@ -4,8 +4,19 @@
 setenforce 0
 sed -i --follow-symlinks 's/SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux
 
+# add yum repo
+echo "${master_ip} ${yum_domain}" >> /etc/hosts
+
+cat << EOF > /etc/yum.repos.d/kw01.repo
+[kw01]
+name=kw01
+#IP of the local repository server set up in the previous step
+baseurl=http://repo.kw01/repo/
+gpgcheck=0
+enabled=1
+EOF
 # Install required packages
-rpm -Uvh kubeadm/packages/*.rpm
+yum install -y kubeadm/packages/*.rpm
 
 # Install containerd
 mkdir -p /etc/containerd
