@@ -5,7 +5,7 @@ sed -i --follow-symlinks 's/SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinu
 
 echo "=== install rpms  ==="
  # Install required packages
-echo "${yum_ip}  ${yum_domain} ${registry_domain}" >> /etc/hosts
+echo "10.10.10.101  repo.kw01 docker.kw01" >> /etc/hosts
 
 echo "=== update registry ca certs ==="
 cp kubeadm/certs/* /etc/pki/ca-trust/source/anchors/
@@ -16,7 +16,7 @@ rm -rf /etc/yum.repos.d/Rocky*
 cat << EOF > /etc/yum.repos.d/kw01.repo
 [kw01]
 name=kw01
-baseurl=http://${yum_domain}/repo/
+baseurl=http://repo.kw01/repo/
 gpgcheck=0
 enabled=1
 module_hotfixes=1

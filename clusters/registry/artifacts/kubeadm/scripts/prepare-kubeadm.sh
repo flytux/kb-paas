@@ -8,7 +8,7 @@ sed -i --follow-symlinks 's/SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinu
 echo "10.10.10.101 repo.kw01" >> /etc/hosts
 
 # Install required packages
-yum install -y kubeadm/packages/*.rpm
+rpm -Uvh --force kubeadm/packages/*.rpm
 
 # Install containerd
 mkdir -p /etc/containerd

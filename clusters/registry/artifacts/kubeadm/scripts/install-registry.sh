@@ -85,7 +85,8 @@ spec:
         command:
         - /bin/sh
         - -c
-        image: docker.io/bash
+        image: bash
+        imagePullPolicy: IfNotPresent
         name: bash
         volumeMounts:
         - mountPath: /app
@@ -177,3 +178,21 @@ nerdctl push docker.kw01/kube-scheduler:v1.27.6
 nerdctl push docker.kw01/kube-proxy:v1.27.6
 nerdctl push docker.kw01/etcd:3.5.7-0
 nerdctl push docker.kw01/coredns:v1.10.1
+
+nerdctl tag calico/apiserver:v3.24.1 docker.kw01/calico/apiserver:v3.24.1
+nerdctl tag calico/cni:v3.24.1 docker.kw01/calico/cni:v3.24.1
+nerdctl tag calico/csi:v3.24.1 docker.kw01/calico/csi:v3.24.1
+nerdctl tag calico/kube-controllers:v3.24.1 docker.kw01/calico/kube-controllers:v3.24.1
+nerdctl tag calico/node-driver-registrar:v3.24.1 docker.kw01/calico/node-driver-registrar:v3.24.1
+nerdctl tag calico/pod2daemon-flexvol:v3.24.1 docker.kw01/calico/pod2daemon-flexvol:v3.24.1
+nerdctl tag calico/typha:v3.24.1 docker.kw01/calico/typha:v3.24.1
+nerdctl tag quay.io/tigera/operator:v1.28.1 docker.kw01/tigera/operator:v1.28.1
+
+nerdctl push docker.kw01/calico/apiserver:v3.24.1
+nerdctl push docker.kw01/calico/cni:v3.24.1
+nerdctl push docker.kw01/calico/csi:v3.24.1
+nerdctl push docker.kw01/calico/kube-controllers:v3.24.1
+nerdctl push docker.kw01/calico/node-driver-registrar:v3.24.1
+nerdctl push docker.kw01/calico/pod2daemon-flexvol:v3.24.1
+nerdctl push docker.kw01/calico/typha:v3.24.1
+nerdctl push docker.kw01/tigera/operator:v1.28.1

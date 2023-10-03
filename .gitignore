@@ -9,3 +9,4 @@ kubectl
 terraform.tfstate*
 registry.crt
 registry.key
+*.rpm

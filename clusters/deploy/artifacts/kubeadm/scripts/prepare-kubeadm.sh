@@ -23,9 +23,7 @@ module_hotfixes=1
 EOF
 
 #yum install -y containerd.io socat conntrack iproute-tc iptables-ebtables iptables
-yum install -y containerd.io container-selinux 
-yum install -y iptables iproute-tc iptables-ebtables
-yum install -y conntrack socat
+rpm -Uvh --force kubeadm/packages/*.rpm
 
 # Install containerd
 mkdir -p /etc/containerd
