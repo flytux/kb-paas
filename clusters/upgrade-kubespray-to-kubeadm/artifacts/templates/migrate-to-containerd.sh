@@ -22,9 +22,8 @@ enabled=1
 module_hotfixes=1
 EOF
 
-yum install -y containerd.io socat conntrack iproute-tc iptables-ebtables --downloadonly --downloaddir=kubeadm/packages
-yum remove -y containerd.io container-selinux socat conntrack iproute-tc iptables-ebtables
-rpm -Uvh kubeadm/packages/*.rpm
+dnf install -y containerd.io iproute-tc iptables-ebtables 
+dnf install -y socat conntrack
 
 mkdir -p /etc/containerd
 \cp kubeadm/packages/config.toml /etc/containerd/
@@ -37,9 +36,12 @@ systemctl restart containerd
 nerdctl load -i kubeadm/images/kubeadm.tar
 
 \cp -rf kubeadm/cni /opt
+\cp -rf kubeadm/.kube $HOME
 
 echo "=== change container runtime annotaion of nodes  ==="
 kubectl get node $(hostname) -o yaml | sed "/creationTimestamp.*/d" | sed "/resourceVersion.*/d" | sed "/uid.*/d" | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
+
+echo "=== stop kubelet ==="
 systemctl stop kubelet
 
 \cp kubeadm/kubernetes/config/kubelet.service /etc/systemd/system
@@ -50,6 +52,7 @@ cat /var/lib/kubelet/kubeadm-flags.env | sed "s/unix:.*sock/unix:\/\/\/run\/cont
 crictl config runtime-endpoint unix:///run/containerd/containerd.sock
 crictl config image-endpoint
 
+echo "=== start kubelet ==="
 systemctl daemon-reload
 systemctl enable kubelet --now
 systemctl disable docker.service --now

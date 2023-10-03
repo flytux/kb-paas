@@ -72,7 +72,7 @@ resource "terraform_data" "upgrade_master_member" {
 
 } 
 resource "terraform_data" "upgrade-worker" {
-  depends_on = [terraform_data.upgrade_master_init]
+  depends_on = [terraform_data.upgrade_master_member]
 
   for_each =  {for key, val in var.kubeadm_nodes:
                key => val if val.role == "worker"}

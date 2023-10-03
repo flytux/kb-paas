@@ -3,7 +3,8 @@ modprobe br_netfilter
 echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
 
 PATH=/usr/local/bin:$PATH
-kubeadm init --pod-network-cidr=192.168.0.0/16 --upload-certs --control-plane-endpoint=100.100.100.101:6443 | \
+dnf install -y socat conntrack
+kubeadm init --pod-network-cidr=192.168.0.0/16 --upload-certs --control-plane-endpoint=100.100.100.101:6443 --image-repository docker.kw01 | \
 sed -e '/kubeadm join/,/--certificate-key/!d' | head -n 3 > join_cmd
 # 02 copy kubeconfig
 mkdir -p $HOME/.kube

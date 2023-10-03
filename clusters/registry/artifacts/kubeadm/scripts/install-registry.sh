@@ -149,3 +149,31 @@ spec:
 EOF
 
 kubectl apply -f nginx-ingress.yaml
+
+# Tag and push images
+nerdctl tag registry.k8s.io/coredns/coredns:v1.9.3 docker.kw01/coredns:v1.9.3
+nerdctl tag registry.k8s.io/etcd:3.5.6-0 docker.kw01/etcd:3.5.6-0
+nerdctl tag registry.k8s.io/kube-apiserver:v1.26.9 docker.kw01/kube-apiserver:v1.26.9
+nerdctl tag registry.k8s.io/kube-controller-manager:v1.26.9 docker.kw01/kube-controller-manager:v1.26.9
+nerdctl tag registry.k8s.io/kube-proxy:v1.26.9 docker.kw01/kube-proxy:v1.26.9
+nerdctl tag registry.k8s.io/kube-scheduler:v1.26.9 docker.kw01/kube-scheduler:v1.26.9
+nerdctl tag registry.k8s.io/pause:3.9 docker.kw01/pause:3.6
+nerdctl tag registry.k8s.io/pause:3.9 docker.kw01/pause:3.8
+nerdctl tag registry.k8s.io/pause:3.9 docker.kw01/pause:3.9
+
+nerdctl push docker.kw01/coredns:v1.9.3
+nerdctl push docker.kw01/etcd:3.5.6-0
+nerdctl push docker.kw01/kube-apiserver:v1.26.9
+nerdctl push docker.kw01/kube-controller-manager:v1.26.9
+nerdctl push docker.kw01/kube-proxy:v1.26.9
+nerdctl push docker.kw01/kube-scheduler:v1.26.9
+nerdctl push docker.kw01/pause:3.6
+nerdctl push docker.kw01/pause:3.8
+nerdctl push docker.kw01/pause:3.9
+
+nerdctl push docker.kw01/kube-apiserver:v1.27.6
+nerdctl push docker.kw01/kube-controller-manager:v1.27.6
+nerdctl push docker.kw01/kube-scheduler:v1.27.6
+nerdctl push docker.kw01/kube-proxy:v1.27.6
+nerdctl push docker.kw01/etcd:3.5.7-0
+nerdctl push docker.kw01/coredns:v1.10.1

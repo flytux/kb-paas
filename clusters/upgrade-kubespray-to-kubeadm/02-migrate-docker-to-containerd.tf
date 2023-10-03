@@ -104,8 +104,6 @@ resource "terraform_data" "worker_containerd_upgrade" {
   provisioner "remote-exec" {
     inline = [<<EOF
 
-      cp -R kubeadm/.kube $HOME
-
       sh kubeadm/scripts/migrate-to-containerd.sh
 
     EOF

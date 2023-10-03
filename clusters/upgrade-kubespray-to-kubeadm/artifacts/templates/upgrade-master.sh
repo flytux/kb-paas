@@ -10,8 +10,6 @@ echo "=== check kubeadm plan ==="
 mv /usr/local/bin/kubeadm kubeadm-$OLD_VERSION
 cp kubeadm/kubernetes/$NEW_VERSION/kubeadm /usr/local/bin/kubeadm && chmod +x /usr/local/bin/kubeadm
 
-crictl config image-endpoint
-
 kubeadm upgrade plan
 
 if [ "$HOST_IP" = "$MASTER_IP" ]

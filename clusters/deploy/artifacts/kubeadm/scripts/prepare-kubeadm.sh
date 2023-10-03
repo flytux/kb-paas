@@ -22,12 +22,10 @@ enabled=1
 module_hotfixes=1
 EOF
 
-rm -rf /etc/yum.repos.d/Rocky*
-
 #yum install -y containerd.io socat conntrack iproute-tc iptables-ebtables iptables
-yum install -y containerd.io socat conntrack iproute-tc iptables-ebtables --downloadonly --downloaddir=kubeadm/packages
-yum remove -y containerd.io socat conntrack iproute-tc iptables-ebtables 
-rpm -Uvh kubeadm/packages/*.rpm
+yum install -y containerd.io container-selinux 
+yum install -y iptables iproute-tc iptables-ebtables
+yum install -y conntrack socat
 
 # Install containerd
 mkdir -p /etc/containerd
@@ -43,7 +41,7 @@ chmod +x /usr/local/bin/*
 cp -R kubeadm/cni /opt
 
 # Load kubeadm container images
-nerdctl load -i kubeadm/images/kubeadm.tar
+#nerdctl load -i kubeadm/images/kubeadm.tar
 
 # Configure and start kubelet
 cp kubeadm/kubernetes/config/kubelet.service /etc/systemd/system
