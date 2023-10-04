@@ -24,7 +24,7 @@ chmod +x /usr/local/bin/*
 cp -R kubeadm/cni /opt
 
 # Load kubeadm container images
-nerdctl load -i kubeadm/images/kubeadm.tar
+nerdctl load -i kubeadm/images/registry.tar
 
 # Configure and start kubelet
 cp kubeadm/kubernetes/config/kubelet.service /etc/systemd/system

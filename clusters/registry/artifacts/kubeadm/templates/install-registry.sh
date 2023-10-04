@@ -158,8 +158,6 @@ nerdctl tag registry.k8s.io/kube-apiserver:v1.26.9 docker.kw01/kube-apiserver:v1
 nerdctl tag registry.k8s.io/kube-controller-manager:v1.26.9 docker.kw01/kube-controller-manager:v1.26.9
 nerdctl tag registry.k8s.io/kube-proxy:v1.26.9 docker.kw01/kube-proxy:v1.26.9
 nerdctl tag registry.k8s.io/kube-scheduler:v1.26.9 docker.kw01/kube-scheduler:v1.26.9
-nerdctl tag registry.k8s.io/pause:3.9 docker.kw01/pause:3.6
-nerdctl tag registry.k8s.io/pause:3.9 docker.kw01/pause:3.8
 nerdctl tag registry.k8s.io/pause:3.9 docker.kw01/pause:3.9
 
 nerdctl push docker.kw01/coredns:v1.9.3
@@ -168,8 +166,6 @@ nerdctl push docker.kw01/kube-apiserver:v1.26.9
 nerdctl push docker.kw01/kube-controller-manager:v1.26.9
 nerdctl push docker.kw01/kube-proxy:v1.26.9
 nerdctl push docker.kw01/kube-scheduler:v1.26.9
-nerdctl push docker.kw01/pause:3.6
-nerdctl push docker.kw01/pause:3.8
 nerdctl push docker.kw01/pause:3.9
 
 nerdctl push docker.kw01/kube-apiserver:v1.27.6
@@ -192,6 +188,7 @@ nerdctl tag quay.io/tigera/operator:v1.28.1 docker.kw01/tigera/operator:v1.28.1
 nerdctl push docker.kw01/calico/apiserver:v3.24.1
 nerdctl push docker.kw01/calico/cni:v3.24.1
 nerdctl push docker.kw01/calico/csi:v3.24.1
+nerdctl push docker.kw01/calico/node:v3.24.1
 nerdctl push docker.kw01/calico/kube-controllers:v3.24.1
 nerdctl push docker.kw01/calico/node-driver-registrar:v3.24.1
 nerdctl push docker.kw01/calico/pod2daemon-flexvol:v3.24.1

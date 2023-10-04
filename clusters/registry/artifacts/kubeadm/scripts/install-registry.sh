@@ -182,6 +182,7 @@ nerdctl push docker.kw01/coredns:v1.10.1
 nerdctl tag calico/apiserver:v3.24.1 docker.kw01/calico/apiserver:v3.24.1
 nerdctl tag calico/cni:v3.24.1 docker.kw01/calico/cni:v3.24.1
 nerdctl tag calico/csi:v3.24.1 docker.kw01/calico/csi:v3.24.1
+nerdctl tag calico/node:v3.24.1 docker.kw01/calico/node:v3.24.1
 nerdctl tag calico/kube-controllers:v3.24.1 docker.kw01/calico/kube-controllers:v3.24.1
 nerdctl tag calico/node-driver-registrar:v3.24.1 docker.kw01/calico/node-driver-registrar:v3.24.1
 nerdctl tag calico/pod2daemon-flexvol:v3.24.1 docker.kw01/calico/pod2daemon-flexvol:v3.24.1

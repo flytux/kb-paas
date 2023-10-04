@@ -6,6 +6,7 @@ resource "terraform_data" "prepare_kubeconfig" {
       sed -i "s/127\.0\.0\.1/${var.master_ip}/g" artifacts/kubeadm/.kube/config
 
       cp ../registry/artifacts/kubeadm/certs/* artifacts/kubeadm/certs
+      cp ../registry/artifacts/kubeadm/images/kubeadm-v1.26.8.tar artifacts/kubeadm/images
     EOF
   }
 

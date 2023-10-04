@@ -32,13 +32,12 @@ cp kubeadm/kubernetes/config/nerdctl.toml /etc/nerdctl/nerdctl.toml
 systemctl restart containerd
 
 \cp kubeadm/kubernetes/bin/*ctl /usr/local/bin && chmod +x /usr/local/bin/*
-nerdctl load -i kubeadm/images/kubeadm.tar
 
 \cp -rf kubeadm/cni /opt
 \cp -rf kubeadm/.kube $HOME
 
 echo "=== change container runtime annotaion of nodes  ==="
-kubectl get node $(hostname) -o yaml | sed "/creationTimestamp.*/d" | sed "/resourceVersion.*/d" | sed "/uid.*/d" | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f -
+while ! kubectl get node $(hostname) -o yaml | sed "/creationTimestamp.*/d" | sed "/resourceVersion.*/d" | sed "/uid.*/d" | sed "s/unix:.*/unix:\/\/\/run\/containerd\/containerd.sock/g" | kubectl apply -f - ; do echo please waits for api-server up; sleep 5; done
 
 echo "=== stop kubelet ==="
 systemctl stop kubelet
