@@ -8,14 +8,17 @@ variable "master_ip" { default = "101.101.101.101" }
 
 variable "network_domain_name" { default = "kubeworks.net" }
 
-#variable "cloud_image_name" { default = "focal-server-cloudimg-amd64.img" }
-variable "cloud_image_name" { default = "Rocky-8-GenericCloud.latest.x86_64.qcow2" }
+variable "cloud_image_name" { default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2" }
 
 variable "disk_pool" { default = "default" }
 
 variable "qemu_connect" { default = "qemu:///system" }
 
-variable "join_cmd" { default = "$(ssh -i $HOME/.ssh/id_rsa.key -o StrictHostKeyChecking=no 101.101.101.101 -- cat join_cmd)" }
+variable "kubeadm_home" { default = "artifacts/kubeadm" }
+variable "yum_ip" { default = "10.10.10.101" }
+variable "yum_domain" { default = "repo.kw01" }
+variable "registry_domain" { default = "docker.kw01" }
+
 
 variable "kubespray_nodes" { 
 

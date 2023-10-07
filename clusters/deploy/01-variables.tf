@@ -8,7 +8,7 @@ variable "master_ip" { default = "100.100.100.101" }
 
 variable "network_domain_name" { default = "kubeworks.net" }
 
-variable "cloud_image_name" { default = "Rocky-8-GenericCloud.latest.x86_64.qcow2" }
+variable "cloud_image_name" { default = "Rocky-8-GenericCloud-8.6.20220702.0.x86_64.qcow2" }
 
 variable "disk_pool" { default = "default" }
 
