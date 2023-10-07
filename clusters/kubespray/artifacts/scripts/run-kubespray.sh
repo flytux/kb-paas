@@ -2,7 +2,7 @@
 
 python3 -m pip install kubeadm/python/*.whl 
 
-tar xvf kubeadm/kubespray.tgz -C kubeadm
+tar xf kubeadm/kubespray.tgz -C kubeadm
 
 cd kubeadm/kubespray
 
