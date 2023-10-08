@@ -1,6 +1,6 @@
 *.tar
 *.img
-kubelet
+kubelet*
 kubectl
 *.key
 *.pub
@@ -10,3 +10,4 @@ terraform.tfstate*
 registry.crt
 registry.key
 *.rpm
+
