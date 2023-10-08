@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Install ingress-controller
-curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml | kubectl apply -f -  
+kubectl apply -f kubeadm/kubernetes/config/nginx-deploy.yaml 
 
 # Patch hostnetwork  
 cat << EOF > patch.yaml
@@ -14,7 +14,7 @@ EOF
 kubectl patch deployment ingress-nginx-controller --patch-file patch.yaml -n ingress-nginx
 
 # Install storage class as default
-kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.24/deploy/local-path-storage.yaml
+kubectl apply -f kubeadm/kubernetes/config/local-path-storage.yaml
 kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
 # Generate registry certs
@@ -48,8 +48,9 @@ persistence:
   size: 5Gi
 EOF
 # Install registry 
-#helm repo add twuni https://helm.twun.io
 kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
+while !  kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s ; do echo please waits for nginx-ingress up; sleep 5; done
+
 helm upgrade -i docker-registry -f registry-values.yaml kubeadm/packages/docker-registry-2.2.2.tgz -n registry  
 
 
@@ -152,62 +153,44 @@ EOF
 kubectl apply -f nginx-ingress.yaml
 
 # Tag and push images
-docker tag bash:latest docker.kw01/bash:latest
-docker tag bitnami/git:2.42.0-debian-11-r26 docker.kw01/bitnami/git:2.42.0-debian-11-r26
-docker tag bitnami/apache:2.4.57-debian-11-r163 docker.kw01/bitnami/apache:2.4.57-debian-11-r163
-docker tag registry.k8s.io/kube-apiserver:v1.27.6 docker.kw01/kube-apiserver:v1.27.6
-docker tag registry.k8s.io/kube-proxy:v1.27.6 docker.kw01/kube-proxy:v1.27.6
-docker tag registry.k8s.io/kube-scheduler:v1.27.6 docker.kw01/kube-scheduler:v1.27.6
-docker tag registry.k8s.io/kube-controller-manager:v1.27.6 docker.kw01/kube-controller-manager:v1.27.6
-docker tag registry.k8s.io/kube-apiserver:v1.26.8 docker.kw01/kube-apiserver:v1.26.8
-docker tag registry.k8s.io/kube-controller-manager:v1.26.8 docker.kw01/kube-controller-manager:v1.26.8
-docker tag registry.k8s.io/kube-scheduler:v1.26.8  docker.kw01/kube-scheduler:v1.26.8
-docker tag registry.k8s.io/kube-proxy:v1.26.8  docker.kw01/kube-proxy:v1.26.8
-docker tag busybox:latest  docker.kw01/busybox:latest
-docker tag registry:2.8.1  docker.kw01/registry:2.8.1
-docker tag rancher/local-path-provisioner:v0.0.24  docker.kw01/rancher/local-path-provisioner:v0.0.24
-docker tag registry.k8s.io/coredns/coredns:v1.10.1  docker.kw01/coredns:v1.10.1
-docker tag registry.k8s.io/etcd:3.5.7-0  docker.kw01/etcd:3.5.7-0
-docker tag registry.k8s.io/etcd:3.5.6-0  docker.kw01/etcd:3.5.6-0
-docker tag registry.k8s.io/pause:3.9  docker.kw01/pause:3.9
-docker tag quay.io/tigera/operator:v1.28.1  docker.kw01/tigera/operator:v1.28.1
-docker tag calico/typha:v3.24.1  docker.kw01/calico/typha:v3.24.1
-docker tag calico/kube-controllers:v3.24.1  docker.kw01/calico/kube-controllers:v3.24.1
-docker tag calico/apiserver:v3.24.1  docker.kw01/calico/apiserver:v3.24.1
-docker tag calico/cni:v3.24.1  docker.kw01/calico/cni:v3.24.1
-docker tag calico/node-driver-registrar:v3.24.1  docker.kw01/calico/node-driver-registrar:v3.24.1
-docker tag calico/csi:v3.24.1  docker.kw01/calico/csi:v3.24.1
-docker tag calico/pod2daemon-flexvol:v3.24.1  docker.kw01/calico/pod2daemon-flexvol:v3.24.1
-docker tag calico/node:v3.24.1  docker.kw01/calico/node:v3.24.1
-docker tag haproxy:2.3  docker.kw01/haproxy:2.3
-docker tag registry.k8s.io/coredns/coredns:v1.9.3  docker.kw01/coredns:v1.9.3
+nerdctl tag bash:latest docker.kw01/bash:latest
+nerdctl tag bitnami/git:2.42.0-debian-11-r26 docker.kw01/bitnami/git:2.42.0-debian-11-r26
+nerdctl tag bitnami/apache:2.4.57-debian-11-r163 docker.kw01/bitnami/apache:2.4.57-debian-11-r163
+nerdctl tag registry.k8s.io/kube-apiserver:v1.27.6 docker.kw01/kube-apiserver:v1.27.6
+nerdctl tag registry.k8s.io/kube-proxy:v1.27.6 docker.kw01/kube-proxy:v1.27.6
+nerdctl tag registry.k8s.io/kube-scheduler:v1.27.6 docker.kw01/kube-scheduler:v1.27.6
+nerdctl tag registry.k8s.io/kube-controller-manager:v1.27.6 docker.kw01/kube-controller-manager:v1.27.6
+nerdctl tag registry.k8s.io/kube-apiserver:v1.26.8 docker.kw01/kube-apiserver:v1.26.8
+nerdctl tag registry.k8s.io/kube-controller-manager:v1.26.8 docker.kw01/kube-controller-manager:v1.26.8
+nerdctl tag registry.k8s.io/kube-scheduler:v1.26.8  docker.kw01/kube-scheduler:v1.26.8
+nerdctl tag registry.k8s.io/kube-proxy:v1.26.8  docker.kw01/kube-proxy:v1.26.8
+nerdctl tag busybox:latest  docker.kw01/busybox:latest
+nerdctl tag registry:2.8.1  docker.kw01/registry:2.8.1
+nerdctl tag rancher/local-path-provisioner:v0.0.24  docker.kw01/rancher/local-path-provisioner:v0.0.24
+nerdctl tag registry.k8s.io/coredns/coredns:v1.10.1  docker.kw01/coredns:v1.10.1
+nerdctl tag registry.k8s.io/etcd:3.5.7-0  docker.kw01/etcd:3.5.7-0
+nerdctl tag registry.k8s.io/etcd:3.5.6-0  docker.kw01/etcd:3.5.6-0
+nerdctl tag registry.k8s.io/pause:3.9  docker.kw01/pause:3.9
+nerdctl tag haproxy:2.3  docker.kw01/haproxy:2.3
+nerdctl tag registry.k8s.io/coredns/coredns:v1.9.3  docker.kw01/coredns:v1.9.3
 
-docker push docker.kw01/bash:latest
-docker push docker.kw01/bitnami/git:2.42.0-debian-11-r26
-docker push docker.kw01/bitnami/apache:2.4.57-debian-11-r163
-docker push docker.kw01/kube-apiserver:v1.27.6
-docker push docker.kw01/kube-proxy:v1.27.6
-docker push docker.kw01/kube-scheduler:v1.27.6
-docker push docker.kw01/kube-controller-manager:v1.27.6
-docker push docker.kw01/kube-apiserver:v1.26.8
-docker push docker.kw01/kube-controller-manager:v1.26.8
-docker push docker.kw01/kube-scheduler:v1.26.8
-docker push docker.kw01/kube-proxy:v1.26.8
-docker push docker.kw01/busybox:latest
-docker push docker.kw01/registry:2.8.1
-docker push docker.kw01/rancher/local-path-provisioner:v0.0.24
-docker push docker.kw01/coredns:v1.10.1
-docker push docker.kw01/etcd:3.5.7-0
-docker push docker.kw01/etcd:3.5.6-0
-docker push docker.kw01/pause:3.9
-docker push docker.kw01/tigera/operator:v1.28.1
-docker push docker.kw01/calico/typha:v3.24.1
-docker push docker.kw01/calico/kube-controllers:v3.24.1
-docker push docker.kw01/calico/apiserver:v3.24.1
-docker push docker.kw01/calico/cni:v3.24.1
-docker push docker.kw01/calico/node-driver-registrar:v3.24.1
-docker push docker.kw01/calico/csi:v3.24.1
-docker push docker.kw01/calico/pod2daemon-flexvol:v3.24.1
-docker push docker.kw01/calico/node:v3.24.1
-docker push docker.kw01/haproxy:2.3
-docker push docker.kw01/coredns:v1.9.3
+nerdctl push docker.kw01/bash:latest
+nerdctl push docker.kw01/bitnami/git:2.42.0-debian-11-r26
+nerdctl push docker.kw01/bitnami/apache:2.4.57-debian-11-r163
+nerdctl push docker.kw01/kube-apiserver:v1.27.6
+nerdctl push docker.kw01/kube-proxy:v1.27.6
+nerdctl push docker.kw01/kube-scheduler:v1.27.6
+nerdctl push docker.kw01/kube-controller-manager:v1.27.6
+nerdctl push docker.kw01/kube-apiserver:v1.26.8
+nerdctl push docker.kw01/kube-controller-manager:v1.26.8
+nerdctl push docker.kw01/kube-scheduler:v1.26.8
+nerdctl push docker.kw01/kube-proxy:v1.26.8
+nerdctl push docker.kw01/busybox:latest
+nerdctl push docker.kw01/registry:2.8.1
+nerdctl push docker.kw01/rancher/local-path-provisioner:v0.0.24
+nerdctl push docker.kw01/coredns:v1.10.1
+nerdctl push docker.kw01/etcd:3.5.7-0
+nerdctl push docker.kw01/etcd:3.5.6-0
+nerdctl push docker.kw01/pause:3.9
+nerdctl push docker.kw01/haproxy:2.3
+nerdctl push docker.kw01/coredns:v1.9.3
