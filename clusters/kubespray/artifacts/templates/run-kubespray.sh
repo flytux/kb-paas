@@ -1,6 +1,8 @@
 #!/bin/sh
 yum localinstall -y kubeadm/packages/python39-3.9.16-1.module+el8.8.0+1328+24532da6.1.x86_64.rpm
 
+docker load -i kubeadm/images/local-images.tar
+
 python3 -m pip install kubeadm/python/*.whl 
 
 cd kubeadm/kubespray
@@ -18,4 +20,4 @@ ansible-playbook -i inventory/mycluster/hosts.yaml  \
   -e container_manager=docker \
   --private-key=~/.ssh/id_rsa.key --become --become-user=root cluster.yml
 
- while ! kubectl create -f $HOME/kubeadm/cni/calico.yaml ; do echo please waits for api-server up; sleep 5; done
+while ! kubectl create -f $HOME/kubeadm/cni/calico.yaml ; do echo please waits for api-server up; sleep 5; done

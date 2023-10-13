@@ -1,0 +1,3 @@
+token: ${token}
+tls-san:
+  - ${master_ip}

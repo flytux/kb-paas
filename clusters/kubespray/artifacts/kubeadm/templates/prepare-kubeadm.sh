@@ -31,6 +31,11 @@ yum localinstall -y kubeadm/packages/iptables-ebtables-1.8.4-24.el8_8.2.x86_64.r
 yum localinstall -y kubeadm/packages/nss-3.90.0-3.el8_8.x86_64.rpm
 yum localinstall -y kubeadm/packages/ipset-7.1-1.el8.x86_64.rpm
 yum localinstall -y kubeadm/packages/bash-completion-2.7-5.el8.noarch.rpm
+yum localinstall -y kubeadm/packages/docker*.rpm
+
+systemctl enable docker --now
+
+docker load -i kubeadm/images/local-images.tar
 
 # Install containerd
 mkdir -p /etc/containerd
@@ -45,7 +50,7 @@ cp kubeadm/kubernetes/bin/* /usr/local/bin
 chmod +x /usr/local/bin/*
 cp -R kubeadm/cni /opt
 
-nerdctl load -i kubeadm/images/local-images.tar
+#nerdctl load -i kubeadm/images/local-images.tar
 # Configure and start kubelet
 cp kubeadm/kubernetes/config/kubelet.service /etc/systemd/system
 mv kubeadm/kubernetes/config/kubelet.service.d /etc/systemd/system
