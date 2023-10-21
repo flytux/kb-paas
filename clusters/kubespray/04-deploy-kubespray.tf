@@ -21,7 +21,7 @@ resource "terraform_data" "copy_installer" {
 
   provisioner "local-exec" {
     command = <<EOF
-    cp ../registry/artifacts/kubeadm/certs/* ${var.kubeadm_home}/certs/
+#    cp ../registry/artifacts/kubeadm/certs/* ${var.kubeadm_home}/certs/
     EOF
   }
 

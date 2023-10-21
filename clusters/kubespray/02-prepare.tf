@@ -37,7 +37,7 @@ resource "libvirt_volume" "os_images" {
   name   = "${each.key}.qcow2"
   # https://download.rockylinux.org/pub/rocky/8/images/x86_64/
   pool   = var.disk_pool
-  source = "../deploy/artifacts/images/${var.cloud_image_name}"
+  source = "../../../cloud-images/${var.cloud_image_name}"
   format = "qcow2"
 
 # Extend libvirt primary volume
